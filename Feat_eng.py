@@ -280,9 +280,14 @@ target.drop(['employed_pop', 'unemployed_pop'], axis=1, inplace=True)
 drop3 = ['pop_16_over', 'pop_in_labor_force', 'pop_25_64',
        'pop_determined_poverty_status', 'population_1_year_and_over',
        'population_3_years_over', 'pop_25_years_over',
-         'four_more_cars', 'no_car', 'no_cars', 'one_car', 
-         'two_cars', 'three_cars']
-
+       'four_more_cars', 'no_car', 'no_cars', 'one_car', 
+       'two_cars', 'three_cars', 'two_parents_not_in_labor_force_families_with_young_children', 
+       'two_parents_mother_in_labor_force_families_with_young_children', 'million_dollar_housing_units', 
+       'vacant_housing_units_for_sale', 'father_one_parent_families_with_young_children', 
+       'father_in_labor_force_one_parent_families_with_young_children', 'mobile_homes', 'armed_forces', 
+       'commuters_by_subway_or_elevated', 'employed_agriculture_forestry_fishing_hunting_mining', 
+       'female_female_households', 'group_quarters', 'male_male_households', 'amerindian_ratio', 
+       'other_race_ratio']
 target.drop(drop3, axis=1, inplace=True)
 
 target['civil_labor_ratio'] = target['civilian_labor_force']/target['total_pop']
