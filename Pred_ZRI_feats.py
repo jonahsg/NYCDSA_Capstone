@@ -166,6 +166,9 @@ diff = new_target.groupby('RegionName')
 # percent change for each year-dependent feature
 test5 = diff[columns].pct_change()
 
+# replacing infinite values with 0
+test5[test5 == np.inf] = 0
+
 # remerging zip and year to be used when finding average percent change across each feature
 test5 = pd.concat([test5, new_target[['RegionName', 'year']]], axis=1)
 
@@ -222,16 +225,36 @@ features2.drop(['Cluster', 'index'], axis=1, inplace=True)
 features2 = features2.sort_values(by=['RegionName', 'year'])
 
 # dropping irrelevant columns with high percentage of null values
-col_to_drop = ['two_parents_not_in_labor_force_families_with_young_children', 
-               'two_parents_mother_in_labor_force_families_with_young_children', 'million_dollar_housing_units', 
-               'vacant_housing_units_for_sale', 'father_one_parent_families_with_young_children', 
-               'father_in_labor_force_one_parent_families_with_young_children', 'mobile_homes', 'armed_forces', 
-               'commuters_by_subway_or_elevated', 'employed_agriculture_forestry_fishing_hunting_mining', 
-               'female_female_households', 'group_quarters', 'male_male_households', 'amerindian_ratio', 
-               'other_race_ratio']
-features2.drop(col_to_drop, axis=1, inplace=True)
+# col_to_drop = ['two_parents_not_in_labor_force_families_with_young_children', 
+#                'two_parents_mother_in_labor_force_families_with_young_children', 'million_dollar_housing_units', 
+#                'vacant_housing_units_for_sale', 'father_one_parent_families_with_young_children', 
+#                'father_in_labor_force_one_parent_families_with_young_children', 'mobile_homes', 'armed_forces', 
+#                'commuters_by_subway_or_elevated', 'employed_agriculture_forestry_fishing_hunting_mining', 
+#                'female_female_households', 'group_quarters', 'male_male_households', 'amerindian_ratio', 
+#                'other_race_ratio']
+# features2.drop(col_to_drop, axis=1, inplace=True)
 
 # dropping remaining rows with null values and removing 2018 feature values (not predictions)
 # final version DF = features3 
 features3 = features2.dropna()
-feature3 = features3[features3['year']>2018]
+future_feats = features3[features3['year']>2018]
+
+# Creating value column from log_value
+future_feats['value'] = np.exp(future_feats['log_value'])
+
+# Removing index and re-indexing
+future_feats = future_feats.reset_index().drop('index', axis = 1)
+
+# Equalizing future feats and future targets rows
+future_merge = future_feats.merge(future_target, how = 'left', on = ['RegionName','year'])
+future_targets = future_merge[['RegionName', 'year', 'ZRI']]
+
+# Adding cluster column to future_feats
+temp = target[['RegionName','Cluster','year']]
+temp = temp[temp['year']==2018]
+temp = temp.drop(columns = 'year')
+future_feats = future_feats.merge(temp, how='left', on='RegionName')
+
+# Rearranging columns
+cols = list(X_train.columns)
+future_feats = future_feats[cols]

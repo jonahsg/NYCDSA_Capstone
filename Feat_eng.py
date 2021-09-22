@@ -297,17 +297,9 @@ target.drop('civilian_labor_force', axis=1, inplace=True)
 
 
 ## Cluster on three features
-df_small_fil = target[['value', 'total_pop', 'median_income']]
-
-scaler = StandardScaler().fit(df_small_fil)
-features = scaler.transform(df_small_fil)
-df_scal = pd.DataFrame(features, columns = df_small_fil.columns)
-
-
-columns = df_small_fil.columns
-kmeans = KMeans(n_clusters = 3)
-y = kmeans.fit_predict(df_small_fil[columns])
-   
+y = pd.read_csv('../data/clusters.csv')
+y = y.drop(columns = 'Unnamed: 0')
+target = target.reset_index().drop('index', axis = 1)
 target['Cluster'] = y
 
 
@@ -325,10 +317,16 @@ train_feat = train_feat.drop('value', axis=1)
 
 
 Y_train = np.log(train[['future_value']])
+Y_train = Y_train.reset_index().drop('index', axis=1)
+zip_train = train_feat.select_dtypes('object').reset_index().drop(['index', 'geo_id', 'zip'], axis=1)
 X_train = train_feat.select_dtypes(exclude=['object'])
+X_train = X_train.reset_index().drop('index', axis=1)
 
 Y_test = np.log(test[['future_value']])
+Y_test = Y_test.reset_index().drop('index', axis=1)
+zip_test = test_feat.select_dtypes('object').reset_index().drop(['index', 'geo_id', 'zip'], axis=1)
 X_test = test_feat.select_dtypes(exclude=['object'])
+X_test = X_test.reset_index().drop('index', axis=1)
 
 
 
